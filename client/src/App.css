@@ -1,0 +1,360 @@
+body, html, .App {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background-attachment: fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.App {
+  background: transparent !important;
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design Rules */
+@media (max-width: 600px) {
+  /* Mobile Styles */
+  .MuiTableContainer-root {
+    font-size: 12px !important;
+  }
+  
+  .MuiTableCell-root {
+    padding: 8px 4px !important;
+    font-size: 12px !important;
+  }
+  
+  .MuiButton-root {
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+  }
+  
+  .MuiTextField-root {
+    font-size: 14px !important;
+  }
+  
+  .MuiCard-root {
+    margin: 8px !important;
+    padding: 16px !important;
+  }
+  
+  .MuiTypography-root {
+    font-size: 14px !important;
+  }
+  
+  /* Hide certain elements on mobile */
+  .mobile-hide {
+    display: none !important;
+  }
+  
+  /* Stack elements vertically */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  /* Full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+  
+  /* Smaller padding on mobile */
+  .mobile-padding {
+    padding: 8px !important;
+  }
+  
+  /* Adjust table for mobile */
+  .MuiTable-root {
+    min-width: 600px !important;
+  }
+  
+  /* Floating buttons adjustments */
+  .floating-buttons {
+    bottom: 16px !important;
+    right: 16px !important;
+  }
+  
+  /* Form elements */
+  .MuiAutocomplete-root {
+    font-size: 14px !important;
+  }
+  
+  /* Icons */
+  .MuiSvgIcon-root {
+    font-size: 20px !important;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 960px) {
+  /* Tablet Styles */
+  .MuiTableContainer-root {
+    font-size: 13px !important;
+  }
+  
+  .MuiTableCell-root {
+    padding: 10px 6px !important;
+    font-size: 13px !important;
+  }
+  
+  .MuiButton-root {
+    font-size: 14px !important;
+    padding: 10px 20px !important;
+  }
+  
+  .MuiTextField-root {
+    font-size: 14px !important;
+  }
+  
+  .MuiCard-root {
+    margin: 12px !important;
+    padding: 20px !important;
+  }
+  
+  .MuiTypography-root {
+    font-size: 15px !important;
+  }
+  
+  /* Tablet specific adjustments */
+  .tablet-stack {
+    flex-direction: column !important;
+  }
+  
+  .tablet-half-width {
+    width: 50% !important;
+  }
+  
+  /* Floating buttons adjustments */
+  .floating-buttons {
+    bottom: 24px !important;
+    right: 24px !important;
+  }
+}
+
+@media (min-width: 961px) {
+  /* Desktop Styles */
+  .MuiTableContainer-root {
+    font-size: 14px !important;
+  }
+  
+  .MuiTableCell-root {
+    padding: 12px 8px !important;
+    font-size: 14px !important;
+  }
+  
+  .MuiButton-root {
+    font-size: 14px !important;
+    padding: 12px 24px !important;
+  }
+  
+  .MuiTextField-root {
+    font-size: 16px !important;
+  }
+  
+  .MuiCard-root {
+    margin: 16px !important;
+    padding: 24px !important;
+  }
+  
+  .MuiTypography-root {
+    font-size: 16px !important;
+  }
+  
+  /* Desktop specific adjustments */
+  .desktop-row {
+    flex-direction: row !important;
+  }
+  
+  .desktop-sidebar {
+    width: 300px !important;
+  }
+  
+  /* Floating buttons adjustments */
+  .floating-buttons {
+    bottom: 32px !important;
+    right: 32px !important;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Touch device optimizations */
+  .MuiButton-root {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  .MuiIconButton-root {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  .MuiTextField-root {
+    min-height: 44px !important;
+  }
+  
+  /* Larger touch targets */
+  .touch-target {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-compact {
+    padding: 8px !important;
+    margin: 4px !important;
+  }
+  
+  .landscape-hide {
+    display: none !important;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .retina-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .MuiPaper-root {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-support {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Focus indicators for accessibility */
+.MuiButton-root:focus,
+.MuiTextField-root:focus,
+.MuiIconButton-root:focus {
+  outline: 2px solid #1976d2 !important;
+  outline-offset: 2px !important;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent text selection on buttons */
+.MuiButton-root {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Error states */
+.error {
+  border-color: #f44336 !important;
+  color: #f44336 !important;
+}
+
+/* Success states */
+.success {
+  border-color: #4caf50 !important;
+  color: #4caf50 !important;
+}
+
+/* Warning states */
+.warning {
+  border-color: #ff9800 !important;
+  color: #ff9800 !important;
+}

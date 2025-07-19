@@ -1,0 +1,26 @@
+.btn {
+  background-color: Gray;
+  color: White;
+  padding: 10px;
+  text-decoration: none;
+  border: none;
+  margin-right: 5px;
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: Black;
+}
+.tbl {
+  margin-top: 25px;
+  border-collapse: collapse;
+}
+.tbl th {
+  background: #ffd700;
+  padding: 10px 5px;
+}
+.tbl td, .tbl th {
+  border: 1px solid #ffd700;
+}
+.txtinput {
+  text-align: right;
+} 
