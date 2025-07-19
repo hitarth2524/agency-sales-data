@@ -4,7 +4,13 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://agency-sales-data.vercel.app', // your Vercel frontend URL
+    'http://localhost:3000' // for local development
+  ],
+  credentials: true // if you use cookies/auth
+}));
 app.use(express.json());
 
 // MongoDB connection
