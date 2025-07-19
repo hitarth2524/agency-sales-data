@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 const api = process.env.REACT_APP_API_URL;
+console.log(api);
 
 const AnimatedCheckmark = () => (
   <svg width="60" height="60" viewBox="0 0 60 60" style={{ display: 'block', margin: '24px auto' }}>
