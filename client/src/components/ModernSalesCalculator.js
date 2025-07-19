@@ -43,6 +43,8 @@ if (!axios.interceptors.request.handlers.length) {
   );
 }
 
+const api = process.env.REACT_APP_API_URL;
+
 const ModernSalesCalculator = () => {
   const [client, setClient] = useState('');
   const [doctor, setDoctor] = useState('');
@@ -80,7 +82,7 @@ const ModernSalesCalculator = () => {
 
   // Fetch doctor options from backend
   useEffect(() => {
-    axios.get('/api/doctors')
+    axios.get(`${api}/api/doctors`)
       .then(res => {
         setDoctorOptions(res.data.map(d => d.name));
       })
@@ -89,7 +91,7 @@ const ModernSalesCalculator = () => {
 
   // Fetch product options from backend
   useEffect(() => {
-    axios.get('/api/products')
+    axios.get(`${api}/api/products`)
       .then(res => {
         setProductOptions(res.data.map(p => p.name));
       })
@@ -98,7 +100,7 @@ const ModernSalesCalculator = () => {
 
   // Fetch all sales for the list
   useEffect(() => {
-    axios.get('/api/sales/all')
+    axios.get(`${api}/api/sales/all`)
       .then(res => setSales(res.data))
       .catch(() => setSales([]));
   }, [selectedSaleId]);
@@ -107,7 +109,7 @@ const ModernSalesCalculator = () => {
   useEffect(() => {
     console.log('doctor useEffect running. doctor:', doctor, 'isEditingFromSaved:', isEditingFromSaved);
     if (doctor && !isEditingFromSaved) {
-      axios.get(`/api/sales/${encodeURIComponent(doctor)}`)
+      axios.get(`${api}/api/sales/${encodeURIComponent(doctor)}`)
         .then(res => {
           const sale = res.data;
           setClient(sale.client || '');
@@ -181,7 +183,7 @@ const ModernSalesCalculator = () => {
     setDoctor(value);
     if (reason === 'input' && value && !doctorOptions.includes(value)) {
       // Add new doctor to backend
-      axios.post('/api/doctors', { name: value })
+      axios.post(`${api}/api/doctors`, { name: value })
         .then(() => {
           setDoctorOptions(prev => [...prev, value]);
         })
@@ -194,7 +196,7 @@ const ModernSalesCalculator = () => {
     setProduct(value);
     if (reason === 'input' && value && !productOptions.includes(value)) {
       // Add new product to backend
-      axios.post('/api/products', { name: value })
+      axios.post(`${api}/api/products`, { name: value })
         .then(() => {
           setProductOptions(prev => [...prev, value]);
         })
@@ -237,7 +239,7 @@ const ModernSalesCalculator = () => {
       date: saleDate,
     };
     if (selectedSaleId && !isEditingFromSaved) {
-      axios.put(`/api/sales/${selectedSaleId}`, data)
+      axios.put(`${api}/api/sales/${selectedSaleId}`, data)
         .then(() => {
           alert('Record updated!');
           setSelectedSaleId(null);
@@ -245,7 +247,7 @@ const ModernSalesCalculator = () => {
         })
         .catch(() => alert('Error updating record.'));
     } else {
-      axios.post('/api/sales', data)
+      axios.post(`${api}/api/sales`, data)
         .then(() => {
           alert('Data saved successfully!');
           setShowPreview(true);
@@ -319,7 +321,7 @@ const ModernSalesCalculator = () => {
   const handleAddDoctor = () => {
     const name = newDoctor.trim();
     if (!name || doctorOptions.includes(name)) return;
-    axios.post('/api/doctors', { name })
+    axios.post(`${api}/api/doctors`, { name })
       .then(() => {
         setDoctorOptions(prev => [...prev, name]);
         setNewDoctor('');
@@ -336,7 +338,7 @@ const ModernSalesCalculator = () => {
 
   // Delete doctor
   const handleDeleteDoctor = (name) => {
-    axios.delete(`/api/doctors/${encodeURIComponent(name)}`)
+    axios.delete(`${api}/api/doctors/${encodeURIComponent(name)}`)
       .then(() => setDoctorOptions(prev => prev.filter(d => d !== name)));
   };
 
@@ -344,7 +346,7 @@ const ModernSalesCalculator = () => {
   const handleAddProduct = () => {
     const name = newProduct.trim();
     if (!name || productOptions.includes(name)) return;
-    axios.post('/api/products', { name })
+    axios.post(`${api}/api/products`, { name })
       .then(() => {
         setProductOptions(prev => [...prev, name]);
         setNewProduct('');
@@ -361,7 +363,7 @@ const ModernSalesCalculator = () => {
 
   // Delete product
   const handleDeleteProduct = (name) => {
-    axios.delete(`/api/products/${encodeURIComponent(name)}`)
+    axios.delete(`${api}/api/products/${encodeURIComponent(name)}`)
       .then(() => setProductOptions(prev => prev.filter(p => p !== name)));
   };
 
@@ -381,7 +383,7 @@ const ModernSalesCalculator = () => {
     const token = localStorage.getItem('token');
     const today = new Date().toISOString().slice(0, 10);
     try {
-      const res = await axios.post('/api/backup', {
+      const res = await axios.post(`${api}/api/backup`, {
         startDate: today,
         endDate: today
       }, {

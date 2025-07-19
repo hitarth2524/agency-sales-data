@@ -4,6 +4,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+const api = process.env.REACT_APP_API_URL;
+
 const AllDoctorsModal = ({ open, onClose, doctorOptions, setDoctorOptions }) => {
   const [editing, setEditing] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -22,15 +24,15 @@ const AllDoctorsModal = ({ open, onClose, doctorOptions, setDoctorOptions }) => 
 
   const handleDelete = (name) => {
     // Find the doctor object by name to get its _id
-    fetch('/api/doctors')
+    fetch(`${api}/api/doctors`)
       .then(res => res.json())
       .then(doctors => {
         const doctor = doctors.find(d => d.name === name);
         if (doctor && doctor._id) {
-          fetch(`/api/doctors/${doctor._id}`, { method: 'DELETE' })
+          fetch(`${api}/api/doctors/${doctor._id}`, { method: 'DELETE' })
             .then(() => {
               // Fetch updated list after delete
-              fetch('/api/doctors')
+              fetch(`${api}/api/doctors`)
                 .then(res => res.json())
                 .then(updated => setDoctorOptions(updated.map(d => d.name)));
             });

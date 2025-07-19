@@ -4,6 +4,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+const api = process.env.REACT_APP_API_URL;
+
 const AllProductsModal = ({ open, onClose, productOptions, setProductOptions }) => {
   const [editing, setEditing] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -22,15 +24,15 @@ const AllProductsModal = ({ open, onClose, productOptions, setProductOptions }) 
 
   const handleDelete = (name) => {
     // Find the product object by name to get its _id
-    fetch('/api/products')
+    fetch(`${api}/api/products`)
       .then(res => res.json())
       .then(products => {
         const product = products.find(p => p.name === name);
         if (product && product._id) {
-          fetch(`/api/products/${product._id}`, { method: 'DELETE' })
+          fetch(`${api}/api/products/${product._id}`, { method: 'DELETE' })
             .then(() => {
               // Fetch updated list after delete
-              fetch('/api/products')
+              fetch(`${api}/api/products`)
                 .then(res => res.json())
                 .then(updated => setProductOptions(updated.map(p => p.name)));
             });

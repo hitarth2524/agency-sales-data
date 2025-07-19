@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
+const api = process.env.REACT_APP_API_URL;
+
 const AnimatedCheckmark = () => (
   <svg width="60" height="60" viewBox="0 0 60 60" style={{ display: 'block', margin: '24px auto' }}>
     <circle cx="30" cy="30" r="28" fill="none" stroke="#43a047" strokeWidth="4" opacity="0.2" />
@@ -55,7 +57,7 @@ const SignUp = ({ onSignUp, children }) => {
     }
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/signup', { username, email, password });
+      const res = await axios.post(`${api}/api/auth/signup`, { username, email, password });
       localStorage.setItem('token', res.data.token);
       setSuccess(true);
       setTimeout(() => {

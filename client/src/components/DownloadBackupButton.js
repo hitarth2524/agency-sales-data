@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const api = process.env.REACT_APP_API_URL;
+
 const DownloadBackupButton = () => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -9,7 +11,7 @@ const DownloadBackupButton = () => {
   const handleDownload = async () => {
     try {
       const token = localStorage.getItem("token");
-      let url = "/api/backup";
+      let url = `${api}/api/backup`;
       const params = [];
       if (from) params.push(`from=${from}`);
       if (to) params.push(`to=${to}`);

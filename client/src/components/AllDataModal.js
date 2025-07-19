@@ -38,12 +38,14 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
   const theme = useTheme();
   const { setCopySaleData } = useContext(CopySaleContext);
 
+  const api = process.env.REACT_APP_API_URL;
+
   // Fetch sales for selected doctor
   useEffect(() => {
     if (doctorSearch) {
       setLoading(true);
       setError('');
-      axios.get(`/api/sales/doctor/${encodeURIComponent(doctorSearch)}`)
+      axios.get(`${api}/api/sales/doctor/${encodeURIComponent(doctorSearch)}`)
         .then(res => {
           // If API returns a single sale, wrap in array for consistency
           const data = Array.isArray(res.data) ? res.data : [res.data];
@@ -84,7 +86,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
 
   const handleEditSave = () => {
     if (!editSale) return;
-    axios.put(`/api/sales/${editSale._id}`, {
+    axios.put(`${api}/api/sales/${editSale._id}`, {
       ...editSale,
       client: editForm.client,
       payable: parseFloat(editForm.payable) || 0,
@@ -103,7 +105,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
 
   const handleDeleteConfirm = () => {
     setDeleteLoading(true);
-    axios.delete(`/api/sales/${deleteId}`)
+    axios.delete(`${api}/api/sales/${deleteId}`)
       .then(() => {
         setSales((prev) => prev.filter((s) => s._id !== deleteId));
         setDeleteId(null);
