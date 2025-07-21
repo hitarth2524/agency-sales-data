@@ -5,16 +5,13 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: [
-    'https://agency-sales-data.vercel.app', // your Vercel frontend URL
-    'http://localhost:3000' // for local development
-  ],
-  credentials: true // if you use cookies/auth
+  origin: 'https://agency-sales-data.vercel.app', // Vercel frontend URL
+  credentials: true
 }));
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/agency_sales_data', {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
