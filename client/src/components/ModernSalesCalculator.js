@@ -267,7 +267,13 @@ const ModernSalesCalculator = () => {
   // PDF Download handler
   const handleDownloadPDF = () => {
     const input = document.getElementById('sales-preview');
-    html2canvas(input).then((canvas) => {
+    // Save original width and style
+    const originalWidth = input.style.width;
+    const originalMaxWidth = input.style.maxWidth;
+    // Set a fixed width for PDF export (A4 width in px, about 794px)
+    input.style.width = '794px';
+    input.style.maxWidth = '794px';
+    html2canvas(input, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgProps = pdf.getImageProperties(imgData);
@@ -275,6 +281,9 @@ const ModernSalesCalculator = () => {
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save('sales-report.pdf');
+      // Restore original width and style
+      input.style.width = originalWidth;
+      input.style.maxWidth = originalMaxWidth;
       setShowPreview(false);
       setDoctor('');
       setClient('');
