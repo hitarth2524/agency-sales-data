@@ -919,35 +919,32 @@ const ModernSalesCalculator = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* Add summary values below the table, right-aligned */}
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: { xs: 'stretch', sm: 'flex-end' }, 
-              mt: 2, 
-              mr: { xs: 0, sm: 2 },
-              ml: { xs: 0, sm: 0 }
-            }}>
-              <Typography sx={{ 
-                fontWeight: 'bold', 
-                color: 'primary.main',
-                fontSize: { xs: 14, sm: 16 },
-                textAlign: { xs: 'center', sm: 'right' }
-              }}><b>Sub Total:</b> {subTotal.toFixed(2)}</Typography>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                mt: 1,
-                justifyContent: { xs: 'center', sm: 'flex-end' },
-                flexDirection: { xs: 'column', sm: 'row' },
-                gap: { xs: 1, sm: 0 }
-              }}>
-                <Typography sx={{ 
-                  fontWeight: 'bold', 
-                  color: 'secondary.main', 
-                  mr: { xs: 0, sm: 1 },
-                  fontSize: { xs: 14, sm: 16 }
-                }}><b>Discount (%):</b></Typography>
+            {/* Summary section directly below the table */}
+            <Box
+              sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: { xs: 'center', sm: 'flex-end' },
+                mt: 2,
+                mb: 2
+              }}
+            >
+              <Typography sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: { xs: 16, sm: 18 }, mb: 0.5 }}>
+                <b>Sub Total:</b> {subTotal.toFixed(2)}
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  gap: { xs: 1, sm: 0 },
+                  mb: 0.5
+                }}
+              >
+                <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', mr: { xs: 0, sm: 1 }, fontSize: { xs: 16, sm: 18 } }}>
+                  <b>Discount (%):</b>
+                </Typography>
                 <TextField
                   value={disc}
                   onChange={e => {
@@ -963,21 +960,19 @@ const ModernSalesCalculator = () => {
                   }}
                   type="number"
                   size="small"
-                  sx={{ 
-                    width: { xs: '100%', sm: 80 }, 
-                    background: '#fff', 
+                  sx={{
+                    width: { xs: 100, sm: 80 },
+                    background: '#fff',
                     borderRadius: 2,
-                    maxWidth: { xs: 120, sm: 80 }
+                    maxWidth: { xs: 120, sm: 80 },
+                    mt: { xs: 1, sm: 0 }
                   }}
                   inputProps={{ min: 0, max: 100 }}
                 />
               </Box>
-              <Typography sx={{ 
-                fontWeight: 'bold', 
-                color: 'success.main',
-                fontSize: { xs: 14, sm: 16 },
-                textAlign: { xs: 'center', sm: 'right' }
-              }}><b>Payable Amount:</b> {payable.toFixed(2)}</Typography>
+              <Typography sx={{ fontWeight: 'bold', color: 'success.main', fontSize: { xs: 16, sm: 18 } }}>
+                <b>Payable Amount:</b> {payable.toFixed(2)}
+              </Typography>
             </Box>
           </Paper>
           <Grid container spacing={2}>
@@ -1169,15 +1164,48 @@ const ModernSalesCalculator = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 4 }}>
+            <Box
+              sx={{
+                mt: 2,
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                alignItems: { xs: 'stretch', sm: 'flex-start' },
+                gap: { xs: 2, sm: 4 }
+              }}
+            >
               <Box sx={{ minWidth: 220, maxWidth: 400, flex: 1 }}>
                 <Typography sx={{ fontWeight: 'bold', mb: 1 }}><b>Message / Notes:</b></Typography>
                 <Typography>{message}</Typography>
               </Box>
-              <Box sx={{ minWidth: 280, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', mr: { xs: 0, md: 20 } }}>
-                <Typography sx={{ fontWeight: 'bold', color: 'primary.main', mb: 1 }}><b>Sub Total:</b> {subTotal.toFixed(2)}</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', mr: 1 }}><b>Discount (%):</b></Typography>
+              <Box
+                sx={{
+                  minWidth: { xs: 'unset', sm: 280 },
+                  width: { xs: '100%', sm: 'auto' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: { xs: 'center', sm: 'flex-end' },
+                  mr: { xs: 0, md: 20 },
+                  mt: { xs: 2, sm: 0 },
+                  gap: 1.5
+                }}
+              >
+                <Typography sx={{ fontWeight: 'bold', color: 'primary.main', mb: 0, fontSize: { xs: 16, sm: 18 } }}>
+                  <b>Sub Total:</b> {subTotal.toFixed(2)}
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mb: 0,
+                    justifyContent: { xs: 'center', sm: 'flex-end' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1, sm: 0 }
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', mr: { xs: 0, sm: 1 }, fontSize: { xs: 16, sm: 18 } }}>
+                    <b>Discount (%):</b>
+                  </Typography>
                   <TextField
                     value={disc}
                     onChange={e => {
@@ -1193,11 +1221,19 @@ const ModernSalesCalculator = () => {
                     }}
                     type="number"
                     size="small"
-                    sx={{ width: 80, background: '#fff', borderRadius: 2, ml: 1 }}
+                    sx={{
+                      width: { xs: 100, sm: 80 },
+                      background: '#fff',
+                      borderRadius: 2,
+                      maxWidth: { xs: 120, sm: 80 },
+                      mt: { xs: 1, sm: 0 }
+                    }}
                     inputProps={{ min: 0, max: 100 }}
                   />
                 </Box>
-                <Typography sx={{ fontWeight: 'bold', color: 'success.main' }}><b>Payable Amount:</b> {payable.toFixed(2)}</Typography>
+                <Typography sx={{ fontWeight: 'bold', color: 'success.main', fontSize: { xs: 16, sm: 18 } }}>
+                  <b>Payable Amount:</b> {payable.toFixed(2)}
+                </Typography>
               </Box>
             </Box>
           </Paper>
