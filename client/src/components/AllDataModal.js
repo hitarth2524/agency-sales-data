@@ -378,7 +378,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                           textAlign: 'center',
                           whiteSpace: 'nowrap'
                         }}>
-                          Payable
+                          Percentage Amount
                         </TableCell>
                         <TableCell sx={{ 
                           color: '#fff', 
@@ -452,7 +452,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                             textAlign: 'center',
                             whiteSpace: 'nowrap'
                           }}>
-                            {sale.payable?.toFixed(2)}
+                            {typeof sale.percentageAmount === 'number' ? sale.percentageAmount.toFixed(2) : '0.00'}
                           </TableCell>
                           <TableCell sx={{ 
                             px: { xs: 0.5, sm: 1 },
@@ -556,7 +556,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                           px: { xs: 1, sm: 2 },
                           py: { xs: 0.5, sm: 1 }
                         }}>
-                          {filteredSales.reduce((sum, sale) => sum + (Number(sale.payable) || 0), 0).toFixed(2)}
+                          {filteredSales.reduce((sum, sale) => sum + (Number(sale.percentageAmount) || 0), 0).toFixed(2)}
                         </TableCell>
                         <TableCell sx={{ 
                           background: 'rgba(102,126,234,0.18)',
@@ -656,7 +656,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                           textAlign: 'center',
                           whiteSpace: 'nowrap'
                         }}>
-                          Payable
+                          Percentage Amount
                         </TableCell>
                         <TableCell sx={{ 
                           color: '#fff', 
@@ -744,7 +744,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                             textAlign: 'center',
                             whiteSpace: 'nowrap'
                           }}>
-                            {sale.payable?.toFixed(2)}
+                            {typeof sale.percentageAmount === 'number' ? sale.percentageAmount.toFixed(2) : '0.00'}
                           </TableCell>
                           <TableCell sx={{ 
                             px: { xs: 0.5, sm: 1 },
@@ -848,7 +848,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                           px: { xs: 1, sm: 2 },
                           py: { xs: 0.5, sm: 1 }
                         }}>
-                          {filteredSales.reduce((sum, sale) => sum + (Number(sale.payable) || 0), 0).toFixed(2)}
+                          {filteredSales.reduce((sum, sale) => sum + (Number(sale.percentageAmount) || 0), 0).toFixed(2)}
                         </TableCell>
                         <TableCell sx={{ 
                           background: 'rgba(102,126,234,0.18)',

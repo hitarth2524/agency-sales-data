@@ -7,6 +7,7 @@ const saleSchema = new mongoose.Schema({
   message: { type: String },
   discount: { type: Number, default: 0 },
   payable: { type: Number, default: 0 },
+  percentageAmount: { type: Number, default: 0 },
   rows: [
     {
       product: String,

@@ -4,8 +4,13 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://agency-sales-data.vercel.app'
+];
+
 app.use(cors({
-  origin: 'https://agency-sales-data.vercel.app', // Vercel frontend URL
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());

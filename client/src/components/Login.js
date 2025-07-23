@@ -44,7 +44,11 @@ const Login = ({ onLogin, children }) => {
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${api}/api/auth/login`, { username, password });
+      const res = await axios.post(
+        `${api}/api/auth/login`,
+        { username, password },
+        { withCredentials: true }
+      );
       localStorage.setItem('token', res.data.token);
       setSuccess(true);
       setTimeout(() => {

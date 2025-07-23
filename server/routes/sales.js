@@ -66,7 +66,16 @@ router.get('/doctor/:doctorName', async (req, res) => {
 // Add new sale for logged-in user
 router.post('/', async (req, res) => {
   try {
-    const sale = new Sale({ ...req.body, userId: req.user.userId, date: new Date() });
+    // Calculate subTotal
+    const rows = req.body.rows || [];
+    const subTotal = rows.reduce((sum, row) => {
+      const totalItem = (parseFloat(row.med1) || 0) + (parseFloat(row.med2) || 0) + (parseFloat(row.med3) || 0) + (parseFloat(row.med4) || 0);
+      const rate = parseFloat(row.rate) || 0;
+      return sum + (totalItem * rate);
+    }, 0);
+    const discount = parseFloat(req.body.discount) || 0;
+    const percentageAmount = (subTotal * discount) / 100;
+    const sale = new Sale({ ...req.body, userId: req.user.userId, date: new Date(), percentageAmount, subTotal });
     await sale.save();
     res.status(201).json(sale);
   } catch (err) {
@@ -77,9 +86,17 @@ router.post('/', async (req, res) => {
 // Update sale (only if it belongs to user)
 router.put('/:id', async (req, res) => {
   try {
+    const rows = req.body.rows || [];
+    const subTotal = rows.reduce((sum, row) => {
+      const totalItem = (parseFloat(row.med1) || 0) + (parseFloat(row.med2) || 0) + (parseFloat(row.med3) || 0) + (parseFloat(row.med4) || 0);
+      const rate = parseFloat(row.rate) || 0;
+      return sum + (totalItem * rate);
+    }, 0);
+    const discount = parseFloat(req.body.discount) || 0;
+    const percentageAmount = (subTotal * discount) / 100;
     const sale = await Sale.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.userId },
-      req.body,
+      { ...req.body, percentageAmount, subTotal },
       { new: true }
     );
     if (!sale) return res.status(404).json({ msg: 'Sale not found' });

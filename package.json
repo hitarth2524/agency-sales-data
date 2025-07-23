@@ -9,10 +9,17 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install"
   },
-  "keywords": ["sales", "agency", "management"],
+  "keywords": [
+    "sales",
+    "agency",
+    "management"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
   }
-} 
+}
