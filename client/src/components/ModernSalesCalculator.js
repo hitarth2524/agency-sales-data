@@ -26,6 +26,7 @@ import AllProductsModal from './AllProductsModal';
 import { CopySaleContext } from './CopySaleContext';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ShareIcon from '@mui/icons-material/Share';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 const initialRow = { product: '', med1: '', med2: '', med3: '', med4: '', rate: '', };
 
@@ -221,6 +222,7 @@ const ModernSalesCalculator = () => {
       alert('Please enter doctor name.');
       return;
     }
+    const percentageAmount = subTotal * (parseFloat(disc) || 0) / 100;
     const data = {
       reportTitle,
       doctor,
@@ -228,6 +230,8 @@ const ModernSalesCalculator = () => {
       message,
       discount: parseFloat(disc) || 0,
       payable,
+      percentageAmount,
+      subTotal,
       rows: rows.map(r => ({
         product: r.product,
         med1: parseFloat(r.med1) || 0,
@@ -413,6 +417,28 @@ const ModernSalesCalculator = () => {
     } catch (err) {
       alert('Backup failed: ' + (err.response?.data?.msg || err.message));
     }
+  };
+
+  // Add this function after handleDownloadPDF
+  const handleViewPDF = async () => {
+    const input = document.getElementById('sales-preview');
+    // Save original width and style
+    const originalWidth = input.style.width;
+    const originalMaxWidth = input.style.maxWidth;
+    input.style.width = '794px';
+    input.style.maxWidth = '794px';
+    const canvas = await html2canvas(input, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    // Open PDF in new tab for viewing/printing
+    window.open(pdf.output('bloburl'), '_blank');
+    // Restore original width and style
+    input.style.width = originalWidth;
+    input.style.maxWidth = originalMaxWidth;
   };
 
   return (
@@ -928,60 +954,53 @@ const ModernSalesCalculator = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* Summary section directly below the table */}
             <Box
               sx={{
                 width: '100%',
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: { xs: 'center', sm: 'flex-end' },
+                justifyContent: 'flex-end',
                 mt: 2,
-                mb: 2
+                mb: 2,
+                pr: { xs: 1, sm: 3, md: 6 }
               }}
             >
-              <Typography sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: { xs: 16, sm: 18 }, mb: 0.5 }}>
-                <b>Sub Total:</b> {subTotal.toFixed(2)}
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: { xs: 1, sm: 0 },
-                  mb: 0.5
-                }}
-              >
-                <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', mr: { xs: 0, sm: 1 }, fontSize: { xs: 16, sm: 18 } }}>
-                  <b>Discount (%):</b>
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
+                  <b>Sub Total:</b> {subTotal.toFixed(2)}
                 </Typography>
-                <TextField
-                  value={disc}
-                  onChange={e => {
-                    let value = e.target.value;
-                    if (value === '') {
-                      setDisc('');
-                      return;
-                    }
-                    const num = Number(value);
-                    if (!isNaN(num) && num >= 0 && num <= 100) {
-                      setDisc(value);
-                    }
-                  }}
-                  type="number"
-                  size="small"
-                  sx={{
-                    width: { xs: 100, sm: 80 },
-                    background: '#fff',
-                    borderRadius: 2,
-                    maxWidth: { xs: 120, sm: 80 },
-                    mt: { xs: 1, sm: 0 }
-                  }}
-                  inputProps={{ min: 0, max: 100 }}
-                />
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 0.5 }}>
+                  <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
+                    <b>percentage (%):</b>
+                  </Typography>
+                  <TextField
+                    value={disc}
+                    onChange={e => {
+                      let value = e.target.value;
+                      if (value === '') {
+                        setDisc('');
+                        return;
+                      }
+                      const num = Number(value);
+                      if (!isNaN(num) && num >= 0 && num <= 100) {
+                        setDisc(value);
+                      }
+                    }}
+                    type="number"
+                    size="small"
+                    sx={{
+                      width: 70,
+                      background: '#fff',
+                      borderRadius: 2,
+                      maxWidth: 90,
+                      input: { textAlign: 'right' }
+                    }}
+                    inputProps={{ min: 0, max: 100 }}
+                  />
+                </Box>
+                <Typography sx={{ fontWeight: 'bold', color: 'purple', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
+                  {`Percentage Amount: ${(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}`}
+                </Typography>
               </Box>
-              <Typography sx={{ fontWeight: 'bold', color: 'success.main', fontSize: { xs: 16, sm: 18 } }}>
-                <b>Payable Amount:</b> {payable.toFixed(2)}
-              </Typography>
             </Box>
           </Paper>
           <Grid container spacing={2}>
@@ -1032,25 +1051,6 @@ const ModernSalesCalculator = () => {
                   }}
                 >
                   {isEditingFromSaved ? 'Save as New Record' : 'Save'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<PrintIcon />}
-                  onClick={handlePrint}
-                  sx={{
-                    fontWeight: 'bold',
-                    fontSize: 13,
-                    borderRadius: 2,
-                    minHeight: 32,
-                    py: 0.5,
-                    px: 2,
-                    boxShadow: 4,
-                    width: { xs: 140, sm: 180 },
-                    mx: 'auto',
-                  }}
-                >
-                  Print
                 </Button>
                 <Button
                   variant="contained"
@@ -1116,9 +1116,25 @@ const ModernSalesCalculator = () => {
       {/* Preview Section */}
       {showPreview && (
         <Box sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 3 }} elevation={4} id="sales-preview">
+          <Paper
+            sx={{
+              p: { xs: 1, sm: 2, md: 3 },
+              width: { xs: '100%', sm: '100%', md: '794px' },
+              minWidth: 0,
+              margin: '0 auto',
+              boxSizing: 'border-box',
+              overflowX: 'auto',
+              '@media print': {
+                width: '794px',
+                margin: '0 auto',
+                boxSizing: 'border-box',
+              }
+            }}
+            elevation={4}
+            id="sales-preview"
+          >
             <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>{reportTitle}</Typography>
-            <Typography variant="subtitle1" sx={{ mb: 2 }}><b>Doctor Name:</b> {doctor}</Typography>
+            <Typography id="doctor-print-title" variant="subtitle1" sx={{ mb: 2 }}><b>Doctor Name:</b> {doctor}</Typography>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -1178,71 +1194,63 @@ const ModernSalesCalculator = () => {
                 mt: 2,
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
-                justifyContent: { xs: 'flex-start', sm: 'space-between' },
-                alignItems: { xs: 'stretch', sm: 'flex-start' },
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
                 gap: { xs: 2, sm: 4 }
               }}
             >
-              <Box sx={{ minWidth: 220, maxWidth: 400, flex: 1 }}>
+              <Box sx={{ flex: 1, minWidth: 220, maxWidth: 400, textAlign: 'left' }}>
                 <Typography sx={{ fontWeight: 'bold', mb: 1 }}><b>Message / Notes:</b></Typography>
                 <Typography>{message}</Typography>
               </Box>
+              {/* Summary section directly below the table, aligned with table right edge */}
               <Box
                 sx={{
-                  minWidth: { xs: 'unset', sm: 280 },
-                  width: { xs: '100%', sm: 'auto' },
+                  width: '100%',
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: { xs: 'center', sm: 'flex-end' },
-                  mr: { xs: 0, md: 20 },
-                  mt: { xs: 2, sm: 0 },
-                  gap: 1.5
+                  justifyContent: 'flex-end',
+                  mt: 2,
+                  mb: 2,
+                  pr: { xs: 1, sm: 3, md: 6 }
                 }}
               >
-                <Typography sx={{ fontWeight: 'bold', color: 'primary.main', mb: 0, fontSize: { xs: 16, sm: 18 } }}>
-                  <b>Sub Total:</b> {subTotal.toFixed(2)}
-                </Typography>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    mb: 0,
-                    justifyContent: { xs: 'center', sm: 'flex-end' },
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    gap: { xs: 1, sm: 0 }
-                  }}
-                >
-                  <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', mr: { xs: 0, sm: 1 }, fontSize: { xs: 16, sm: 18 } }}>
-                    <b>Discount (%):</b>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
+                    <b>Sub Total:</b> {subTotal.toFixed(2)}
                   </Typography>
-                  <TextField
-                    value={disc}
-                    onChange={e => {
-                      let value = e.target.value;
-                      if (value === '') {
-                        setDisc('');
-                        return;
-                      }
-                      const num = Number(value);
-                      if (!isNaN(num) && num >= 0 && num <= 100) {
-                        setDisc(value);
-                      }
-                    }}
-                    type="number"
-                    size="small"
-                    sx={{
-                      width: { xs: 100, sm: 80 },
-                      background: '#fff',
-                      borderRadius: 2,
-                      maxWidth: { xs: 120, sm: 80 },
-                      mt: { xs: 1, sm: 0 }
-                    }}
-                    inputProps={{ min: 0, max: 100 }}
-                  />
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 0.5 }}>
+                    <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
+                      <b>percentage (%):</b>
+                    </Typography>
+                    <TextField
+                      value={disc}
+                      onChange={e => {
+                        let value = e.target.value;
+                        if (value === '') {
+                          setDisc('');
+                          return;
+                        }
+                        const num = Number(value);
+                        if (!isNaN(num) && num >= 0 && num <= 100) {
+                          setDisc(value);
+                        }
+                      }}
+                      type="number"
+                      size="small"
+                      sx={{
+                        width: 70,
+                        background: '#fff',
+                        borderRadius: 2,
+                        maxWidth: 90,
+                        input: { textAlign: 'right' }
+                      }}
+                      inputProps={{ min: 0, max: 100 }}
+                    />
+                  </Box>
+                  <Typography sx={{ fontWeight: 'bold', color: 'purple', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
+                    {`Percentage Amount: ${(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}`}
+                  </Typography>
                 </Box>
-                <Typography sx={{ fontWeight: 'bold', color: 'success.main', fontSize: { xs: 16, sm: 18 } }}>
-                  <b>Payable Amount:</b> {payable.toFixed(2)}
-                </Typography>
               </Box>
             </Box>
           </Paper>
@@ -1250,8 +1258,37 @@ const ModernSalesCalculator = () => {
             <Button variant="contained" color="warning" sx={{ mt: 2, fontWeight: 'bold', borderRadius: 2 }} onClick={handleDownloadPDF} startIcon={<PictureAsPdfIcon />}>
               Download PDF
             </Button>
+            <Button variant="contained" color="info" sx={{ mt: 2, fontWeight: 'bold', borderRadius: 2 }} onClick={handleViewPDF} startIcon={<PictureAsPdfIcon />}>
+              View PDF
+            </Button>
             <Button variant="contained" color="success" sx={{ mt: 2, fontWeight: 'bold', borderRadius: 2 }} onClick={handleSharePDF} startIcon={<ShareIcon />}>
               Share
+            </Button>
+            <Button variant="contained" color="info" sx={{ mt: 2, fontWeight: 'bold', borderRadius: 2 }} onClick={async () => {
+              const input = document.getElementById('sales-preview');
+              const canvas = await html2canvas(input);
+              const imgData = canvas.toDataURL('image/png');
+              const pdf = new jsPDF('p', 'mm', 'a4');
+              const imgProps = pdf.getImageProperties(imgData);
+              const pdfWidth = pdf.internal.pageSize.getWidth();
+              const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+              pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+              const pdfBlob = pdf.output('blob');
+              // Try to use the Web Share API for email, fallback to mailto
+              if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })] })) {
+                try {
+                  await navigator.share({
+                    title: 'Sales Report',
+                    text: 'Please find attached the sales report.',
+                    files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })],
+                  });
+                  return;
+                } catch (err) {}
+              }
+              // Fallback: open mailto link and instruct user to attach the PDF manually
+              window.open('mailto:?subject=Sales Report&body=Please find attached the sales report PDF. (Download the PDF and attach it to this email.)');
+            }} startIcon={<MailOutlineIcon />}>
+              Email
             </Button>
           </Box>
         </Box>
@@ -1264,7 +1301,24 @@ const ModernSalesCalculator = () => {
           .MuiPaper-root { box-shadow: none !important; }
           .MuiButton-root, .MuiAutocomplete-root, .MuiTextField-root, .MuiTableCell-root input { display: none !important; }
           .MuiTableCell-root { border: 1px solid #ccc !important; }
-          .MuiTypography-root { color: #000 !important; }
+          #sales-preview h5, #sales-preview .MuiTypography-h5 { font-size: 28px !important; font-weight: bold !important; color: #1976d2 !important; text-align: center !important; }
+          #sales-preview .doctor-name, #sales-preview .MuiTypography-subtitle1 { font-size: 28px !important; font-weight: bold !important; color: #222 !important; text-align: center !important; }
+          #sales-preview .doctor-print-title { font-size: 32px !important; font-weight: bold !important; color: #222 !important; text-align: center !important; display: block !important; margin-bottom: 16px !important; margin-top: 8px !important; }
+          #sales-preview th, #sales-preview .MuiTableCell-head { font-size: 20px !important; font-weight: bold !important; }
+          #sales-preview, #sales-preview * {
+            font-size: 18px !important;
+            font-weight: bold !important;
+            color: inherit !important;
+            background: none !important;
+            box-shadow: none !important;
+          }
+          #sales-preview > .MuiBox-root {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 32px !important;
+          }
         }
       `}</style>
 
