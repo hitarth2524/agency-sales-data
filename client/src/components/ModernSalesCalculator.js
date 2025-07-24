@@ -117,6 +117,16 @@ const ModernSalesCalculator = () => {
           setRows(sale.rows && sale.rows.length ? sale.rows : [{ ...initialRow }]);
           setDisc(sale.discount?.toString() || '');
           setMessage(sale.message || '');
+          if (sale.medicalHeaders && Array.isArray(sale.medicalHeaders)) {
+            setMedicalHeaders(sale.medicalHeaders);
+          } else {
+            setMedicalHeaders([
+              'Medical 1',
+              'Medical 2',
+              'Medical 3',
+              'Medical 4',
+            ]);
+          }
           setIsEditingFromSaved(false);
         })
         .catch(() => {
@@ -124,6 +134,12 @@ const ModernSalesCalculator = () => {
           setRows([{ ...initialRow }]);
           setDisc('');
           setMessage('');
+          setMedicalHeaders([
+            'Medical 1',
+            'Medical 2',
+            'Medical 3',
+            'Medical 4',
+          ]);
           setIsEditingFromSaved(false);
         });
     }
@@ -145,6 +161,16 @@ const ModernSalesCalculator = () => {
         setMessage(saleData.message || '');
         setReportTitle(saleData.reportTitle || 'Sales Report');
         setSaleDate(saleData.date ? new Date(saleData.date).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10));
+        if (saleData.medicalHeaders && Array.isArray(saleData.medicalHeaders)) {
+          setMedicalHeaders(saleData.medicalHeaders);
+        } else {
+          setMedicalHeaders([
+            'Medical 1',
+            'Medical 2',
+            'Medical 3',
+            'Medical 4',
+          ]);
+        }
         setSelectedSaleId(null);
         setShowPreview(false);
         setIsEditingFromSaved(true);
@@ -232,6 +258,7 @@ const ModernSalesCalculator = () => {
       payable,
       percentageAmount,
       subTotal,
+      medicalHeaders, // Save custom medical column names
       rows: rows.map(r => ({
         product: r.product,
         med1: parseFloat(r.med1) || 0,
@@ -277,7 +304,7 @@ const ModernSalesCalculator = () => {
     // Set a fixed width for PDF export (A4 width in px, about 794px)
     input.style.width = '794px';
     input.style.maxWidth = '794px';
-    html2canvas(input, { scale: 2 }).then((canvas) => {
+    html2canvas(input, { scale: 4 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgProps = pdf.getImageProperties(imgData);
@@ -303,7 +330,13 @@ const ModernSalesCalculator = () => {
   // PDF Share handler
   const handleSharePDF = async () => {
     const input = document.getElementById('sales-preview');
-    const canvas = await html2canvas(input);
+    // Save original width and style
+    const originalWidth = input.style.width;
+    const originalMaxWidth = input.style.maxWidth;
+    // Set a fixed width for PDF export (A4 width in px, about 794px)
+    input.style.width = '794px';
+    input.style.maxWidth = '794px';
+    const canvas = await html2canvas(input, { scale: 4 });
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgProps = pdf.getImageProperties(imgData);
@@ -321,6 +354,9 @@ const ModernSalesCalculator = () => {
           text: 'Check out my sales report!',
           files: [file]
         });
+        // Restore original width and style
+        input.style.width = originalWidth;
+        input.style.maxWidth = originalMaxWidth;
         return;
       } catch (err) {
         // fallback to WhatsApp
@@ -328,6 +364,9 @@ const ModernSalesCalculator = () => {
     }
     // fallback to WhatsApp
     window.open(whatsappUrl, '_blank');
+    // Restore original width and style
+    input.style.width = originalWidth;
+    input.style.maxWidth = originalMaxWidth;
   };
 
   // Add doctor
@@ -427,7 +466,7 @@ const ModernSalesCalculator = () => {
     const originalMaxWidth = input.style.maxWidth;
     input.style.width = '794px';
     input.style.maxWidth = '794px';
-    const canvas = await html2canvas(input, { scale: 2 });
+    const canvas = await html2canvas(input, { scale: 4 });
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgProps = pdf.getImageProperties(imgData);
@@ -673,7 +712,7 @@ const ModernSalesCalculator = () => {
         </Box>
         <Box sx={{ mb: 2, mt: 4 }}>
           <TextField
-            label="Date"
+            label="DATE"
             type="date"
             value={saleDate}
             onChange={e => setSaleDate(e.target.value)}
@@ -688,7 +727,7 @@ const ModernSalesCalculator = () => {
             }}
           />
           <TextField
-            label="Sales Report"
+            label="SALES REPORT"
             value={reportTitle}
             onChange={e => setReportTitle(e.target.value)}
             fullWidth
@@ -708,7 +747,7 @@ const ModernSalesCalculator = () => {
             fullWidth
             sx={{ width: '100%', mb: 2 }}
             renderInput={(params) => (
-              <TextField {...params} label="Doctor Name" variant="outlined" fullWidth size="medium"
+              <TextField {...params} label="DOCTOR NAME" variant="outlined" fullWidth size="medium"
                 sx={{ 
                   background: '#fff', 
                   borderRadius: 2, 
@@ -965,11 +1004,11 @@ const ModernSalesCalculator = () => {
               }}
             >
               <Box sx={{ textAlign: 'right' }}>
-                <Typography sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
-                  <b>Sub Total:</b> {subTotal.toFixed(2)}
+                <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
+                  <b>Sub Total: {subTotal.toFixed(2)}</b>
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 0.5 }}>
-                  <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
+                  <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
                     <b>percentage (%):</b>
                   </Typography>
                   <TextField
@@ -992,13 +1031,13 @@ const ModernSalesCalculator = () => {
                       background: '#fff',
                       borderRadius: 2,
                       maxWidth: 90,
-                      input: { textAlign: 'right' }
+                      input: { textAlign: 'right', fontWeight: 'bold' }
                     }}
                     inputProps={{ min: 0, max: 100 }}
                   />
                 </Box>
-                <Typography sx={{ fontWeight: 'bold', color: 'purple', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
-                  {`Percentage Amount: ${(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}`}
+                <Typography sx={{ fontWeight: 'bold', color: 'red', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
+                  <b>Percentage Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
                 </Typography>
               </Box>
             </Box>
@@ -1133,8 +1172,8 @@ const ModernSalesCalculator = () => {
             elevation={4}
             id="sales-preview"
           >
-            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>{reportTitle}</Typography>
-            <Typography id="doctor-print-title" variant="subtitle1" sx={{ mb: 2 }}><b>Doctor Name:</b> {doctor}</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'black', mb: 2, textAlign: 'center' }}>{reportTitle ? reportTitle.toUpperCase() : ''}</Typography>
+            <Typography id="doctor-print-title" variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold', color: 'black', fontSize: '14px !important' }}><b>DOCTOR NAME:</b> {doctor ? doctor.toUpperCase() : ''}</Typography>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -1154,7 +1193,13 @@ const ModernSalesCalculator = () => {
                       headers.push('Total Item', 'Rate', 'Total Amount');
                       
                       return headers.map((header, idx) => (
-                        <TableCell key={header}>{header}</TableCell>
+                        <TableCell key={idx} sx={{ fontWeight: 'bold' }}>
+                          {String(
+                            typeof header === 'string'
+                              ? header
+                              : (header && header.props && header.props.children) || ''
+                          ).toUpperCase()}
+                        </TableCell>
                       ));
                     })()}
                   </TableRow>
@@ -1175,7 +1220,7 @@ const ModernSalesCalculator = () => {
                     
                     return (
                       <TableRow key={idx}>
-                        <TableCell>{row.product}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{row.product ? row.product.toUpperCase() : ''}</TableCell>
                         {allHasMed1 && <TableCell>{hasMed1 ? row.med1 : ''}</TableCell>}
                         {allHasMed2 && <TableCell>{hasMed2 ? row.med2 : ''}</TableCell>}
                         {allHasMed3 && <TableCell>{hasMed3 ? row.med3 : ''}</TableCell>}
@@ -1215,11 +1260,11 @@ const ModernSalesCalculator = () => {
                 }}
               >
                 <Box sx={{ textAlign: 'right' }}>
-                  <Typography sx={{ fontWeight: 'bold', color: 'primary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
-                    <b>Sub Total:</b> {subTotal.toFixed(2)}
+                  <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
+                    <b>Sub Total: {subTotal.toFixed(2)}</b>
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 0.5 }}>
-                    <Typography sx={{ fontWeight: 'bold', color: 'secondary.main', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
+                    <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
                       <b>percentage (%):</b>
                     </Typography>
                     <TextField
@@ -1242,13 +1287,13 @@ const ModernSalesCalculator = () => {
                         background: '#fff',
                         borderRadius: 2,
                         maxWidth: 90,
-                        input: { textAlign: 'right' }
+                        input: { textAlign: 'right', fontWeight: 'bold' }
                       }}
                       inputProps={{ min: 0, max: 100 }}
                     />
                   </Box>
-                  <Typography sx={{ fontWeight: 'bold', color: 'purple', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
-                    {`Percentage Amount: ${(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}`}
+                  <Typography sx={{ fontWeight: 'bold', color: 'red', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
+                    <b>Percentage Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
                   </Typography>
                 </Box>
               </Box>
@@ -1297,7 +1342,14 @@ const ModernSalesCalculator = () => {
       <style>{`
         @media print {
           .no-print { display: none !important; }
-          body { background: white !important; }
+          body, #sales-preview {
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            -webkit-font-smoothing: antialiased !important;
+            font-smoothing: antialiased !important;
+            color-adjust: exact !important;
+          }
           .MuiPaper-root { box-shadow: none !important; }
           .MuiButton-root, .MuiAutocomplete-root, .MuiTextField-root, .MuiTableCell-root input { display: none !important; }
           .MuiTableCell-root { border: 1px solid #ccc !important; }
@@ -1311,6 +1363,8 @@ const ModernSalesCalculator = () => {
             color: inherit !important;
             background: none !important;
             box-shadow: none !important;
+            -webkit-font-smoothing: antialiased !important;
+            font-smoothing: antialiased !important;
           }
           #sales-preview > .MuiBox-root {
             display: flex !important;

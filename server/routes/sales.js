@@ -75,7 +75,7 @@ router.post('/', async (req, res) => {
     }, 0);
     const discount = parseFloat(req.body.discount) || 0;
     const percentageAmount = (subTotal * discount) / 100;
-    const sale = new Sale({ ...req.body, userId: req.user.userId, date: new Date(), percentageAmount, subTotal });
+    const sale = new Sale({ ...req.body, userId: req.user.userId, date: new Date(), percentageAmount, subTotal, medicalHeaders: req.body.medicalHeaders });
     await sale.save();
     res.status(201).json(sale);
   } catch (err) {
@@ -96,7 +96,7 @@ router.put('/:id', async (req, res) => {
     const percentageAmount = (subTotal * discount) / 100;
     const sale = await Sale.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.userId },
-      { ...req.body, percentageAmount, subTotal },
+      { ...req.body, percentageAmount, subTotal, medicalHeaders: req.body.medicalHeaders },
       { new: true }
     );
     if (!sale) return res.status(404).json({ msg: 'Sale not found' });

@@ -8,6 +8,10 @@ const saleSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   payable: { type: Number, default: 0 },
   percentageAmount: { type: Number, default: 0 },
+  medicalHeaders: {
+    type: [String],
+    default: ['Medical 1', 'Medical 2', 'Medical 3', 'Medical 4']
+  },
   rows: [
     {
       product: String,
