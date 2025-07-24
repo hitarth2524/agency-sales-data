@@ -333,7 +333,6 @@ const ModernSalesCalculator = () => {
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
-    // Set a fixed width for PDF export (A4 width in px, about 794px)
     input.style.width = '794px';
     input.style.maxWidth = '794px';
     const canvas = await html2canvas(input, { scale: 4 });
@@ -345,13 +344,11 @@ const ModernSalesCalculator = () => {
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     const pdfBlob = pdf.output('blob');
     const file = new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' });
-    const message = encodeURIComponent('Check out my sales report!');
-    const whatsappUrl = `https://wa.me/?text=${message}`;
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           title: 'Sales Report',
-          text: 'Check out my sales report!',
+          text: 'Please find attached the sales report.',
           files: [file]
         });
         // Restore original width and style
@@ -359,11 +356,19 @@ const ModernSalesCalculator = () => {
         input.style.maxWidth = originalMaxWidth;
         return;
       } catch (err) {
-        // fallback to WhatsApp
+        // fallback below
       }
     }
-    // fallback to WhatsApp
-    window.open(whatsappUrl, '_blank');
+    // Fallback: download the PDF so the user can manually share it
+    const url = window.URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'sales-report.pdf');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    alert('Sharing PDF is not supported on this device/browser. The PDF has been downloaded so you can share it manually.');
     // Restore original width and style
     input.style.width = originalWidth;
     input.style.maxWidth = originalMaxWidth;
@@ -473,8 +478,10 @@ const ModernSalesCalculator = () => {
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    // Open PDF in new tab for viewing/printing
-    window.open(pdf.output('bloburl'), '_blank');
+    // Open PDF in new tab for viewing/printing (never auto-download)
+    const blob = pdf.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
     // Restore original width and style
     input.style.width = originalWidth;
     input.style.maxWidth = originalMaxWidth;
