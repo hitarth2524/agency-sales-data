@@ -298,6 +298,8 @@ const ModernSalesCalculator = () => {
   // PDF Download handler
   const handleDownloadPDF = () => {
     const input = document.getElementById('sales-preview');
+    // Add pdf-export class for smaller font/row height
+    input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
@@ -312,9 +314,10 @@ const ModernSalesCalculator = () => {
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save('sales-report.pdf');
-      // Restore original width and style
+      // Restore original width, style, and remove pdf-export class
       input.style.width = originalWidth;
       input.style.maxWidth = originalMaxWidth;
+      input.classList.remove('pdf-export');
       setShowPreview(false);
       setDoctor('');
       setClient('');
@@ -466,6 +469,8 @@ const ModernSalesCalculator = () => {
   // Add this function after handleDownloadPDF
   const handleViewPDF = async () => {
     const input = document.getElementById('sales-preview');
+    // Add pdf-export class for smaller font/row height
+    input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
@@ -485,6 +490,7 @@ const ModernSalesCalculator = () => {
     // Restore original width and style
     input.style.width = originalWidth;
     input.style.maxWidth = originalMaxWidth;
+    input.classList.remove('pdf-export');
   };
 
   return (
@@ -1253,7 +1259,7 @@ const ModernSalesCalculator = () => {
             >
               <Box sx={{ flex: 1, minWidth: 220, maxWidth: 400, textAlign: 'left' }}>
                 <Typography sx={{ fontWeight: 'bold', mb: 1 }}><b>Message / Notes:</b></Typography>
-                <Typography>{message}</Typography>
+                <Typography sx={{ whiteSpace: 'pre-line' }}>{message}</Typography>
               </Box>
               {/* Summary section directly below the table, aligned with table right edge */}
               <Box
@@ -1380,6 +1386,9 @@ const ModernSalesCalculator = () => {
             align-items: flex-start !important;
             gap: 32px !important;
           }
+          .pdf-export #sales-preview th, .pdf-export #sales-preview .MuiTableCell-head { font-size: 14px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview td, .pdf-export #sales-preview .MuiTableCell-root { font-size: 12px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview .MuiTableCell-root input { display: block !important; }
         }
       `}</style>
 
