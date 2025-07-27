@@ -298,8 +298,6 @@ const ModernSalesCalculator = () => {
   // PDF Download handler
   const handleDownloadPDF = () => {
     const input = document.getElementById('sales-preview');
-    // Add pdf-export class for optimized font sizes
-    input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
@@ -357,12 +355,11 @@ const ModernSalesCalculator = () => {
         
         pdf.save('sales-report.pdf');
         
-        // Restore original width, style, and remove pdf-export class
+        // Restore original width and style
         input.style.width = originalWidth;
         input.style.maxWidth = originalMaxWidth;
         input.style.height = originalHeight;
         input.style.overflow = originalOverflow;
-        input.classList.remove('pdf-export');
         
         setShowPreview(false);
         setDoctor('');
@@ -380,8 +377,6 @@ const ModernSalesCalculator = () => {
   // PDF Share handler
   const handleSharePDF = async () => {
     const input = document.getElementById('sales-preview');
-    // Add pdf-export class for optimized font sizes
-    input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
@@ -441,12 +436,11 @@ const ModernSalesCalculator = () => {
       const pdfBlob = pdf.output('blob');
       const file = new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' });
       
-      // Restore original width, style, and remove pdf-export class
+      // Restore original width and style
       input.style.width = originalWidth;
       input.style.maxWidth = originalMaxWidth;
       input.style.height = originalHeight;
       input.style.overflow = originalOverflow;
-      input.classList.remove('pdf-export');
       
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
@@ -565,28 +559,73 @@ const ModernSalesCalculator = () => {
   // Add this function after handleDownloadPDF
   const handleViewPDF = async () => {
     const input = document.getElementById('sales-preview');
-    // Add pdf-export class for smaller font/row height
-    input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
-    input.style.width = '794px';
-    input.style.maxWidth = '794px';
-    const canvas = await html2canvas(input, { scale: 4 });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    // Open PDF in new tab for viewing/printing (never auto-download)
-    const blob = pdf.output('blob');
-    const blobUrl = URL.createObjectURL(blob);
-    window.open(blobUrl, '_blank');
-    // Restore original width and style
-    input.style.width = originalWidth;
-    input.style.maxWidth = originalMaxWidth;
-    input.classList.remove('pdf-export');
+    const originalHeight = input.style.height;
+    const originalOverflow = input.style.overflow;
+    
+    // Set optimized dimensions for PDF export
+    input.style.width = '800px';
+    input.style.maxWidth = '800px';
+    input.style.height = 'auto';
+    input.style.overflow = 'visible';
+    
+    // Wait a bit for DOM to update
+    setTimeout(async () => {
+      const canvas = await html2canvas(input, { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: input.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      // Check if content fits on one page
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      if (pdfHeight <= pageHeight) {
+        // Single page
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      } else {
+        // Multiple pages
+        let heightLeft = pdfHeight;
+        let position = 0;
+        let page = 1;
+        
+        while (heightLeft >= pageHeight) {
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pageHeight;
+          if (heightLeft >= pageHeight) {
+            pdf.addPage();
+            position -= pageHeight;
+            page++;
+          }
+        }
+        
+        // Add remaining content
+        if (heightLeft > 0) {
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        }
+      }
+      
+      // Open PDF in new tab for viewing/printing (never auto-download)
+      const blob = pdf.output('blob');
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+      
+      // Restore original width and style
+      input.style.width = originalWidth;
+      input.style.maxWidth = originalMaxWidth;
+      input.style.height = originalHeight;
+      input.style.overflow = originalOverflow;
+    }, 100);
   };
 
   return (
@@ -1146,7 +1185,7 @@ const ModernSalesCalculator = () => {
                   />
                 </Box>
                 <Typography sx={{ fontWeight: 'bold', color: 'red', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
-                  <b>Percentage Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
+                  <b>Payable Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
                 </Typography>
               </Box>
             </Box>
@@ -1294,7 +1333,16 @@ const ModernSalesCalculator = () => {
             <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'black', mb: 2, textAlign: 'center', fontSize: { xs: 20, sm: 22, md: 24 } }}>{reportTitle ? reportTitle.toUpperCase() : ''}</Typography>
             <Typography id="doctor-print-title" variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold', color: 'black', fontSize: { xs: 18, sm: 20, md: 22 } }}><b>DOCTOR NAME:</b> {doctor ? doctor.toUpperCase() : ''}</Typography>
             <TableContainer>
-              <Table>
+              <Table sx={{ 
+                '& .MuiTableRow-root': {
+                  '& td, & th': {
+                    padding: '1px 0px',
+                    borderBottom: '1px solid #ddd',
+                    fontSize: '10px',
+                    lineHeight: '0.9'
+                  }
+                }
+              }}>
                 <TableHead>
                   <TableRow>
                     {(() => {
@@ -1412,7 +1460,7 @@ const ModernSalesCalculator = () => {
                     />
                   </Box>
                   <Typography sx={{ fontWeight: 'bold', color: 'red', fontSize: { xs: 16, sm: 18, md: 20 }, mb: 0.5 }}>
-                    <b>Percentage Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
+                    <b>Payable Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
                   </Typography>
                 </Box>
               </Box>
@@ -1430,8 +1478,6 @@ const ModernSalesCalculator = () => {
             </Button>
             <Button variant="contained" color="info" sx={{ mt: 2, fontWeight: 'bold', borderRadius: 2 }} onClick={async () => {
               const input = document.getElementById('sales-preview');
-              // Add pdf-export class for optimized font sizes
-              input.classList.add('pdf-export');
               // Save original width and style
               const originalWidth = input.style.width;
               const originalMaxWidth = input.style.maxWidth;
@@ -1490,12 +1536,11 @@ const ModernSalesCalculator = () => {
                 
                 const pdfBlob = pdf.output('blob');
                 
-                // Restore original width, style, and remove pdf-export class
+                // Restore original width and style
                 input.style.width = originalWidth;
                 input.style.maxWidth = originalMaxWidth;
                 input.style.height = originalHeight;
                 input.style.overflow = originalOverflow;
-                input.classList.remove('pdf-export');
                 
                 // Try to use the Web Share API for email, fallback to mailto
                 if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })] })) {
@@ -1531,7 +1576,12 @@ const ModernSalesCalculator = () => {
           }
           .MuiPaper-root { box-shadow: none !important; }
           .MuiButton-root, .MuiAutocomplete-root, .MuiTextField-root, .MuiTableCell-root input { display: none !important; }
-          .MuiTableCell-root { border: 1px solid #ccc !important; }
+          .MuiTableCell-root { 
+            border: 1px solid #ccc !important; 
+            padding: 0px 0px !important;
+            font-size: 9px !important;
+            line-height: 0.8 !important;
+          }
           #sales-preview h5, #sales-preview .MuiTypography-h5 { font-size: 28px !important; font-weight: bold !important; color: #1976d2 !important; text-align: center !important; }
           #sales-preview .doctor-name, #sales-preview .MuiTypography-subtitle1 { font-size: 28px !important; font-weight: bold !important; color: #222 !important; text-align: center !important; }
           #sales-preview .doctor-print-title { font-size: 32px !important; font-weight: bold !important; color: #222 !important; text-align: center !important; display: block !important; margin-bottom: 16px !important; margin-top: 8px !important; }
@@ -1552,13 +1602,7 @@ const ModernSalesCalculator = () => {
             align-items: flex-start !important;
             gap: 32px !important;
           }
-          .pdf-export #sales-preview th, .pdf-export #sales-preview .MuiTableCell-head { font-size: 16px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview td, .pdf-export #sales-preview .MuiTableCell-root { font-size: 14px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview .MuiTableCell-root input { display: block !important; }
-          .pdf-export #sales-preview h5, .pdf-export #sales-preview .MuiTypography-h5 { font-size: 20px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview .doctor-name, .pdf-export #sales-preview .MuiTypography-subtitle1 { font-size: 18px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview .MuiTypography-root { font-size: 16px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview { padding: 20px !important; margin: 0 !important; }
+          /* PDF export will use the same styles as preview - no special overrides */
         }
       `}</style>
 

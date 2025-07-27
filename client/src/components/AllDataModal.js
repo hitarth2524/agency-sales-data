@@ -378,7 +378,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                           textAlign: 'center',
                           whiteSpace: 'nowrap'
                         }}>
-                          Percentage Amount
+                          Payable Amount
                         </TableCell>
                         <TableCell sx={{ 
                           color: '#fff', 
@@ -656,7 +656,7 @@ const AllDataModal = ({ open, onClose, doctorOptions, salesRefreshKey }) => {
                           textAlign: 'center',
                           whiteSpace: 'nowrap'
                         }}>
-                          Percentage Amount
+                          Payable Amount
                         </TableCell>
                         <TableCell sx={{ 
                           color: '#fff', 
