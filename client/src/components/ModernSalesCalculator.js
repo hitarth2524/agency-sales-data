@@ -1291,8 +1291,8 @@ const ModernSalesCalculator = () => {
             elevation={4}
             id="sales-preview"
           >
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'black', mb: 2, textAlign: 'center' }}>{reportTitle ? reportTitle.toUpperCase() : ''}</Typography>
-            <Typography id="doctor-print-title" variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold', color: 'black', fontSize: '14px !important' }}><b>DOCTOR NAME:</b> {doctor ? doctor.toUpperCase() : ''}</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'black', mb: 2, textAlign: 'center', fontSize: { xs: 24, sm: 28, md: 32 } }}>{reportTitle ? reportTitle.toUpperCase() : ''}</Typography>
+            <Typography id="doctor-print-title" variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold', color: 'black', fontSize: { xs: 20, sm: 22, md: 24 } }}><b>DOCTOR NAME:</b> {doctor ? doctor.toUpperCase() : ''}</Typography>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -1364,8 +1364,8 @@ const ModernSalesCalculator = () => {
               }}
             >
               <Box sx={{ flex: 1, minWidth: 220, maxWidth: 400, textAlign: 'left' }}>
-                <Typography sx={{ fontWeight: 'bold', mb: 1 }}><b>Message / Notes:</b></Typography>
-                <Typography sx={{ whiteSpace: 'pre-line', fontWeight: 'bold', fontSize: '16px' }}>{message}</Typography>
+                <Typography sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: 18, sm: 20, md: 22 } }}><b>Message / Notes:</b></Typography>
+                <Typography sx={{ whiteSpace: 'pre-line', fontWeight: 'bold', fontSize: { xs: 18, sm: 20, md: 22 } }}>{message}</Typography>
               </Box>
               {/* Summary section directly below the table, aligned with table right edge */}
               <Box
@@ -1379,11 +1379,11 @@ const ModernSalesCalculator = () => {
                 }}
               >
                 <Box sx={{ textAlign: 'right' }}>
-                  <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 15, sm: 16, md: 18 }, mb: 0.5 }}>
+                  <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 22, sm: 24, md: 26 }, mb: 0.5 }}>
                     <b>Sub Total: {subTotal.toFixed(2)}</b>
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 0.5 }}>
-                    <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 15, sm: 16, md: 18 }, mr: 1 }}>
+                    <Typography sx={{ fontWeight: 'bold', color: 'black', fontSize: { xs: 20, sm: 22, md: 24 }, mr: 1 }}>
                       <b>percentage (%):</b>
                     </Typography>
                     <TextField
@@ -1411,7 +1411,7 @@ const ModernSalesCalculator = () => {
                       inputProps={{ min: 0, max: 100 }}
                     />
                   </Box>
-                  <Typography sx={{ fontWeight: 'bold', color: 'red', fontSize: { xs: 14, sm: 15, md: 16 }, mb: 0.5 }}>
+                  <Typography sx={{ fontWeight: 'bold', color: 'red', fontSize: { xs: 20, sm: 22, md: 24 }, mb: 0.5 }}>
                     <b>Percentage Amount:</b> {(subTotal * (parseFloat(disc) || 0) / 100).toFixed(2)}
                   </Typography>
                 </Box>
@@ -1552,13 +1552,13 @@ const ModernSalesCalculator = () => {
             align-items: flex-start !important;
             gap: 32px !important;
           }
-          .pdf-export #sales-preview th, .pdf-export #sales-preview .MuiTableCell-head { font-size: 16px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview td, .pdf-export #sales-preview .MuiTableCell-root { font-size: 14px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview th, .pdf-export #sales-preview .MuiTableCell-head { font-size: 24px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview td, .pdf-export #sales-preview .MuiTableCell-root { font-size: 20px !important; font-weight: bold !important; }
           .pdf-export #sales-preview .MuiTableCell-root input { display: block !important; }
-          .pdf-export #sales-preview h5, .pdf-export #sales-preview .MuiTypography-h5 { font-size: 20px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview .doctor-name, .pdf-export #sales-preview .MuiTypography-subtitle1 { font-size: 18px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview .MuiTypography-root { font-size: 14px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview { padding: 20px !important; margin: 0 !important; }
+          .pdf-export #sales-preview h5, .pdf-export #sales-preview .MuiTypography-h5 { font-size: 32px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview .doctor-name, .pdf-export #sales-preview .MuiTypography-subtitle1 { font-size: 28px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview .MuiTypography-root { font-size: 20px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview { padding: 30px !important; margin: 0 !important; }
         }
       `}</style>
 
