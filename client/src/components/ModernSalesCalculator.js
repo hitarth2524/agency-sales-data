@@ -298,83 +298,179 @@ const ModernSalesCalculator = () => {
   // PDF Download handler
   const handleDownloadPDF = () => {
     const input = document.getElementById('sales-preview');
-    // Add pdf-export class for smaller font/row height
+    // Add pdf-export class for optimized font sizes
     input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
-    // Set a fixed width for PDF export (A4 width in px, about 794px)
-    input.style.width = '794px';
-    input.style.maxWidth = '794px';
-    html2canvas(input, { scale: 4 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('sales-report.pdf');
-      // Restore original width, style, and remove pdf-export class
-      input.style.width = originalWidth;
-      input.style.maxWidth = originalMaxWidth;
-      input.classList.remove('pdf-export');
-      setShowPreview(false);
-      setDoctor('');
-      setClient('');
-      setRows([{ ...initialRow }]);
-      setDisc('');
-      setMessage('');
-      setReportTitle('Sales Report');
-      setSaleDate(new Date().toISOString().slice(0, 10));
-      setIsEditingFromSaved(false);
-    });
+    const originalHeight = input.style.height;
+    const originalOverflow = input.style.overflow;
+    
+    // Set optimized dimensions for PDF export
+    input.style.width = '800px';
+    input.style.maxWidth = '800px';
+    input.style.height = 'auto';
+    input.style.overflow = 'visible';
+    
+    // Wait a bit for DOM to update
+    setTimeout(() => {
+      html2canvas(input, { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: input.scrollHeight
+      }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        // Check if content fits on one page
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        if (pdfHeight <= pageHeight) {
+          // Single page
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        } else {
+          // Multiple pages
+          let heightLeft = pdfHeight;
+          let position = 0;
+          let page = 1;
+          
+          while (heightLeft >= pageHeight) {
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pageHeight;
+            if (heightLeft >= pageHeight) {
+              pdf.addPage();
+              position -= pageHeight;
+              page++;
+            }
+          }
+          
+          // Add remaining content
+          if (heightLeft > 0) {
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          }
+        }
+        
+        pdf.save('sales-report.pdf');
+        
+        // Restore original width, style, and remove pdf-export class
+        input.style.width = originalWidth;
+        input.style.maxWidth = originalMaxWidth;
+        input.style.height = originalHeight;
+        input.style.overflow = originalOverflow;
+        input.classList.remove('pdf-export');
+        
+        setShowPreview(false);
+        setDoctor('');
+        setClient('');
+        setRows([{ ...initialRow }]);
+        setDisc('');
+        setMessage('');
+        setReportTitle('Sales Report');
+        setSaleDate(new Date().toISOString().slice(0, 10));
+        setIsEditingFromSaved(false);
+      });
+    }, 100);
   };
 
   // PDF Share handler
   const handleSharePDF = async () => {
     const input = document.getElementById('sales-preview');
+    // Add pdf-export class for optimized font sizes
+    input.classList.add('pdf-export');
     // Save original width and style
     const originalWidth = input.style.width;
     const originalMaxWidth = input.style.maxWidth;
-    input.style.width = '794px';
-    input.style.maxWidth = '794px';
-    const canvas = await html2canvas(input, { scale: 4 });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    const pdfBlob = pdf.output('blob');
-    const file = new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' });
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          title: 'Sales Report',
-          text: 'Please find attached the sales report.',
-          files: [file]
-        });
-        // Restore original width and style
-        input.style.width = originalWidth;
-        input.style.maxWidth = originalMaxWidth;
-        return;
-      } catch (err) {
-        // fallback below
+    const originalHeight = input.style.height;
+    const originalOverflow = input.style.overflow;
+    
+    // Set optimized dimensions for PDF export
+    input.style.width = '800px';
+    input.style.maxWidth = '800px';
+    input.style.height = 'auto';
+    input.style.overflow = 'visible';
+    
+    // Wait a bit for DOM to update
+    setTimeout(async () => {
+      const canvas = await html2canvas(input, { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: input.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      // Check if content fits on one page
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      if (pdfHeight <= pageHeight) {
+        // Single page
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      } else {
+        // Multiple pages
+        let heightLeft = pdfHeight;
+        let position = 0;
+        let page = 1;
+        
+        while (heightLeft >= pageHeight) {
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pageHeight;
+          if (heightLeft >= pageHeight) {
+            pdf.addPage();
+            position -= pageHeight;
+            page++;
+          }
+        }
+        
+        // Add remaining content
+        if (heightLeft > 0) {
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        }
       }
-    }
-    // Fallback: download the PDF so the user can manually share it
-    const url = window.URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'sales-report.pdf');
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-    alert('Sharing PDF is not supported on this device/browser. The PDF has been downloaded so you can share it manually.');
-    // Restore original width and style
-    input.style.width = originalWidth;
-    input.style.maxWidth = originalMaxWidth;
+      
+      const pdfBlob = pdf.output('blob');
+      const file = new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' });
+      
+      // Restore original width, style, and remove pdf-export class
+      input.style.width = originalWidth;
+      input.style.maxWidth = originalMaxWidth;
+      input.style.height = originalHeight;
+      input.style.overflow = originalOverflow;
+      input.classList.remove('pdf-export');
+      
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: 'Sales Report',
+            text: 'Please find attached the sales report.',
+            files: [file]
+          });
+          return;
+        } catch (err) {
+          // fallback below
+        }
+      }
+      // Fallback: download the PDF so the user can manually share it
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'sales-report.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      alert('Sharing PDF is not supported on this device/browser. The PDF has been downloaded so you can share it manually.');
+    }, 100);
   };
 
   // Add doctor
@@ -1080,7 +1176,17 @@ const ModernSalesCalculator = () => {
                   multiline
                   minRows={3}
                   variant="outlined"
-                  sx={{ background: '#fff', borderRadius: 2 }}
+                  sx={{ 
+                    background: '#fff', 
+                    borderRadius: 2,
+                    '& .MuiInputBase-input': {
+                      fontWeight: 'bold',
+                      fontSize: '16px'
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontWeight: 'bold'
+                    }
+                  }}
                 />
               </Paper>
               {/* SAVE and PRINT buttons moved below Message/Notes */}
@@ -1259,7 +1365,7 @@ const ModernSalesCalculator = () => {
             >
               <Box sx={{ flex: 1, minWidth: 220, maxWidth: 400, textAlign: 'left' }}>
                 <Typography sx={{ fontWeight: 'bold', mb: 1 }}><b>Message / Notes:</b></Typography>
-                <Typography sx={{ whiteSpace: 'pre-line' }}>{message}</Typography>
+                <Typography sx={{ whiteSpace: 'pre-line', fontWeight: 'bold', fontSize: '16px' }}>{message}</Typography>
               </Box>
               {/* Summary section directly below the table, aligned with table right edge */}
               <Box
@@ -1324,27 +1430,87 @@ const ModernSalesCalculator = () => {
             </Button>
             <Button variant="contained" color="info" sx={{ mt: 2, fontWeight: 'bold', borderRadius: 2 }} onClick={async () => {
               const input = document.getElementById('sales-preview');
-              const canvas = await html2canvas(input);
-              const imgData = canvas.toDataURL('image/png');
-              const pdf = new jsPDF('p', 'mm', 'a4');
-              const imgProps = pdf.getImageProperties(imgData);
-              const pdfWidth = pdf.internal.pageSize.getWidth();
-              const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-              pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-              const pdfBlob = pdf.output('blob');
-              // Try to use the Web Share API for email, fallback to mailto
-              if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })] })) {
-                try {
-                  await navigator.share({
-                    title: 'Sales Report',
-                    text: 'Please find attached the sales report.',
-                    files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })],
-                  });
-                  return;
-                } catch (err) {}
-              }
-              // Fallback: open mailto link and instruct user to attach the PDF manually
-              window.open('mailto:?subject=Sales Report&body=Please find attached the sales report PDF. (Download the PDF and attach it to this email.)');
+              // Add pdf-export class for optimized font sizes
+              input.classList.add('pdf-export');
+              // Save original width and style
+              const originalWidth = input.style.width;
+              const originalMaxWidth = input.style.maxWidth;
+              const originalHeight = input.style.height;
+              const originalOverflow = input.style.overflow;
+              
+              // Set optimized dimensions for PDF export
+              input.style.width = '800px';
+              input.style.maxWidth = '800px';
+              input.style.height = 'auto';
+              input.style.overflow = 'visible';
+              
+              // Wait a bit for DOM to update
+              setTimeout(async () => {
+                const canvas = await html2canvas(input, { 
+                  scale: 2,
+                  useCORS: true,
+                  allowTaint: true,
+                  backgroundColor: '#ffffff',
+                  width: 800,
+                  height: input.scrollHeight
+                });
+                
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                
+                // Check if content fits on one page
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                if (pdfHeight <= pageHeight) {
+                  // Single page
+                  pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                } else {
+                  // Multiple pages
+                  let heightLeft = pdfHeight;
+                  let position = 0;
+                  let page = 1;
+                  
+                  while (heightLeft >= pageHeight) {
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                    heightLeft -= pageHeight;
+                    if (heightLeft >= pageHeight) {
+                      pdf.addPage();
+                      position -= pageHeight;
+                      page++;
+                    }
+                  }
+                  
+                  // Add remaining content
+                  if (heightLeft > 0) {
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                  }
+                }
+                
+                const pdfBlob = pdf.output('blob');
+                
+                // Restore original width, style, and remove pdf-export class
+                input.style.width = originalWidth;
+                input.style.maxWidth = originalMaxWidth;
+                input.style.height = originalHeight;
+                input.style.overflow = originalOverflow;
+                input.classList.remove('pdf-export');
+                
+                // Try to use the Web Share API for email, fallback to mailto
+                if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })] })) {
+                  try {
+                    await navigator.share({
+                      title: 'Sales Report',
+                      text: 'Please find attached the sales report.',
+                      files: [new File([pdfBlob], 'sales-report.pdf', { type: 'application/pdf' })],
+                    });
+                    return;
+                  } catch (err) {}
+                }
+                // Fallback: open mailto link and instruct user to attach the PDF manually
+                window.open('mailto:?subject=Sales Report&body=Please find attached the sales report PDF. (Download the PDF and attach it to this email.)');
+              }, 100);
             }} startIcon={<MailOutlineIcon />}>
               Email
             </Button>
@@ -1386,9 +1552,13 @@ const ModernSalesCalculator = () => {
             align-items: flex-start !important;
             gap: 32px !important;
           }
-          .pdf-export #sales-preview th, .pdf-export #sales-preview .MuiTableCell-head { font-size: 14px !important; font-weight: bold !important; }
-          .pdf-export #sales-preview td, .pdf-export #sales-preview .MuiTableCell-root { font-size: 12px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview th, .pdf-export #sales-preview .MuiTableCell-head { font-size: 16px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview td, .pdf-export #sales-preview .MuiTableCell-root { font-size: 14px !important; font-weight: bold !important; }
           .pdf-export #sales-preview .MuiTableCell-root input { display: block !important; }
+          .pdf-export #sales-preview h5, .pdf-export #sales-preview .MuiTypography-h5 { font-size: 20px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview .doctor-name, .pdf-export #sales-preview .MuiTypography-subtitle1 { font-size: 18px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview .MuiTypography-root { font-size: 14px !important; font-weight: bold !important; }
+          .pdf-export #sales-preview { padding: 20px !important; margin: 0 !important; }
         }
       `}</style>
 
